@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Launchpad</title>
+  <meta name="description" content="A real, working web product built at the Agentic Building workshop." />
+  <style>
+    :root {
+      --bg: #fbfaf8;
+      --card: #ffffff;
+      --ink: #1a1a1a;
+      --muted: #6b6b6b;
+      --line: #e7e3dc;
+      --accent: #2f5bea;
+      --accent-soft: #eaf0ff;
+      --radius: 10px;
+      --radius-sm: 4px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #14151a; --card: #1c1e26; --ink: #f2f2f2; --muted: #a0a0a8;
+        --line: #2c2f3a; --accent: #8ea9ff; --accent-soft: #232838;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5; -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 56px 20px 80px; }
+    header { margin-bottom: 40px; }
+    .kicker {
+      font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--accent); font-weight: 700; margin: 0 0 10px;
+    }
+    h1 { font-size: clamp(30px, 6vw, 46px); line-height: 1.1; margin: 0 0 14px; }
+    .lede { font-size: 18px; color: var(--muted); margin: 0; max-width: 52ch; }
+    .grid { display: grid; gap: 16px; grid-template-columns: 1fr; margin: 36px 0; }
+    @media (min-width: 620px) { .grid { grid-template-columns: 1fr 1fr 1fr; } }
+    .card {
+      display: block; text-decoration: none; color: inherit;
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 20px; transition: transform .12s ease, border-color .12s ease;
+    }
+    .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .card .emoji { font-size: 30px; display: block; margin-bottom: 10px; }
+    .card h3 { margin: 0 0 6px; font-size: 17px; }
+    .card p { margin: 0; font-size: 14px; color: var(--muted); }
+    .how {
+      background: var(--accent-soft); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 22px 24px; margin-top: 8px;
+    }
+    .how h2 { margin: 0 0 12px; font-size: 18px; }
+    .how ol { margin: 0; padding-left: 20px; }
+    .how li { margin: 8px 0; }
+    code {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius-sm); padding: 2px 6px; font-size: 13px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+    footer { margin-top: 44px; color: var(--muted); font-size: 13px; }
+    .toggle {
+      position: fixed; top: 16px; right: 16px; background: var(--card);
+      border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px;
+      font-size: 13px; cursor: pointer; color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle" id="themeBtn" aria-label="Toggle dark mode">🌙 Theme</button>
+  <div class="wrap">
+    <header>
+      <p class="kicker">Built at the Agentic Building workshop</p>
+      <h1 id="hi">Hi, I'm building something real.</h1>
+      <p class="lede">This page is live on the internet right now. Pick a starter below,
+        then tell your AI agent to turn it into your own product.</p>
+    </header>
+
+    <div class="grid">
+      <a class="card" href="seeds/tracker.html">
+        <span class="emoji">✅</span>
+        <h3>Tracker</h3>
+        <p>A list you can add to and check off. Good for habits, homework, water, workouts.</p>
+      </a>
+      <a class="card" href="seeds/quiz.html">
+        <span class="emoji">🧠</span>
+        <h3>Quiz</h3>
+        <p>Answer questions, get a result. Good for a decision helper, a study quiz, a recommender.</p>
+      </a>
+      <a class="card" href="seeds/gallery.html">
+        <span class="emoji">🖼️</span>
+        <h3>Gallery / Board</h3>
+        <p>A wall of cards you can add to. Good for photos, picks, a team, an event, recommendations.</p>
+      </a>
+    </div>
+
+    <div class="how">
+      <h2>Make one of these yours</h2>
+      <ol>
+        <li>Open the <strong>Chat</strong> panel in VS Code and switch it to <strong>Agent</strong> mode.</li>
+        <li>Type one sentence, for example:
+          <br /><code>Start from the tracker seed and make it a tracker for our club fundraiser that shows how close we are to our goal. Keep it to one file for now.</code></li>
+        <li>Read what the agent changed, run it in the preview, and keep steering until it works.</li>
+        <li>Push your changes. This page updates itself in about a minute.</li>
+      </ol>
+    </div>
+
+    <footer>
+      <p>Change this text to your own name. This is your site now, and it is yours to keep.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Small interactive touch: remember the visitor's theme choice.
+    const btn = document.getElementById("themeBtn");
+    const saved = localStorage.getItem("theme");
+    if (saved) document.documentElement.style.colorScheme = saved;
+    function currentIsDark() {
+      const cs = document.documentElement.style.colorScheme;
+      if (cs) return cs === "dark";
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    btn.addEventListener("click", () => {
+      const next = currentIsDark() ? "light" : "dark";
+      document.documentElement.style.colorScheme = next;
+      // Also flip our CSS variables by toggling a data attribute the browser respects.
+      localStorage.setItem("theme", next);
+      applyTheme(next);
+    });
+    function applyTheme(mode) {
+      const dark = mode === "dark";
+      const r = document.documentElement.style;
+      r.setProperty("--bg", dark ? "#14151a" : "#fbfaf8");
+      r.setProperty("--card", dark ? "#1c1e26" : "#ffffff");
+      r.setProperty("--ink", dark ? "#f2f2f2" : "#1a1a1a");
+      r.setProperty("--muted", dark ? "#a0a0a8" : "#6b6b6b");
+      r.setProperty("--line", dark ? "#2c2f3a" : "#e7e3dc");
+      r.setProperty("--accent", dark ? "#8ea9ff" : "#2f5bea");
+      r.setProperty("--accent-soft", dark ? "#232838" : "#eaf0ff");
+    }
+    if (saved) applyTheme(saved);
+  </script>
+</body>
+</html>

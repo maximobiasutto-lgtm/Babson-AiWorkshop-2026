@@ -1,0 +1,58 @@
+# Publishes your site to GitHub Pages every time you push to main.
+# You do not need to edit this file. Just push, and your site goes live.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never cancel an in-progress deploy: cancelling can leave a "success" that
+# never actually propagates to the CDN.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # The very first run happens before you have turned Pages on. Rather than
+      # failing with a red X, say what to do and stop here.
+      - name: Is GitHub Pages turned on?
+        id: check
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages")
+          if [ "$code" = "200" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Turn on Pages first::Go to Settings, then Pages, and set Source to GitHub Actions. Then push again and your site goes live."
+          fi
+
+      - name: Checkout
+        if: steps.check.outputs.ready == 'true'
+        uses: actions/checkout@v4
+      - name: Configure Pages
+        if: steps.check.outputs.ready == 'true'
+        uses: actions/configure-pages@v5
+      - name: Upload the whole site
+        if: steps.check.outputs.ready == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+      - name: Deploy
+        id: deployment
+        if: steps.check.outputs.ready == 'true'
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gallery Board</title>
+  <meta name="description" content="A wall of cards you can add to." />
+  <style>
+    :root {
+      --bg:#fbfaf8; --card:#fff; --ink:#1a1a1a; --muted:#6b6b6b; --line:#e7e3dc;
+      --accent:#2f5bea; --accent-soft:#eaf0ff; --radius:10px; --radius-sm:4px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#14151a; --card:#1c1e26; --ink:#f2f2f2; --muted:#a0a0a8;
+        --line:#2c2f3a; --accent:#8ea9ff; --accent-soft:#232838; }
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height:1.5; }
+    .wrap { max-width: 820px; margin: 0 auto; padding: 48px 20px 72px; }
+    h1 { font-size: clamp(26px,5vw,36px); margin: 0 0 4px; }
+    .sub { color: var(--muted); margin: 0 0 24px; }
+    form {
+      display: grid; gap: 10px; background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 18px; margin-bottom: 28px;
+    }
+    @media (min-width: 560px) { form { grid-template-columns: 1fr 1fr; } form .full { grid-column: 1 / -1; } }
+    input, textarea {
+      width: 100%; padding: 11px 13px; font-size: 15px; color: var(--ink); font-family: inherit;
+      background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    }
+    input:focus, textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 52px; }
+    button {
+      font-size: 15px; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm);
+      border: 1px solid var(--accent); background: var(--accent); color: #fff; padding: 12px 16px;
+    }
+    button:hover { filter: brightness(1.05); }
+    .board { display: grid; gap: 16px; grid-template-columns: 1fr; }
+    @media (min-width: 560px) { .board { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 780px) { .board { grid-template-columns: 1fr 1fr 1fr; } }
+    .item {
+      position: relative; background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .thumb {
+      height: 120px; display: grid; place-items: center; font-size: 46px;
+      background: var(--accent-soft);
+    }
+    .body { padding: 14px; }
+    .body h3 { margin: 0 0 6px; font-size: 16px; }
+    .body p { margin: 0; font-size: 14px; color: var(--muted); }
+    .del {
+      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,.45); color: #fff;
+      border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 15px;
+    }
+    .empty { color: var(--muted); text-align: center; padding: 28px 0; grid-column: 1 / -1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>My Board</h1>
+    <p class="sub">Add cards. They save automatically. Use any emoji as the picture.</p>
+
+    <form id="adder">
+      <input type="text" id="emoji" placeholder="Emoji (e.g. 🍕)" maxlength="4" />
+      <input type="text" id="title" placeholder="Title" required />
+      <textarea class="full" id="note" placeholder="A short note..."></textarea>
+      <button class="full" type="submit">Add to board</button>
+    </form>
+
+    <div class="board" id="board"></div>
+  </div>
+
+  <script>
+    const KEY = "gallery-items";
+    let items = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (items === null) {
+      // Start with one example card so the board is never empty on first load.
+      items = [{ emoji: "🌟", title: "Example card", note: "Delete me and add your own." }];
+    }
+
+    const board = document.getElementById("board");
+    const form = document.getElementById("adder");
+    const emojiEl = document.getElementById("emoji");
+    const titleEl = document.getElementById("title");
+    const noteEl = document.getElementById("note");
+
+    function save() { localStorage.setItem(KEY, JSON.stringify(items)); }
+
+    function render() {
+      board.innerHTML = "";
+      if (items.length === 0) {
+        board.innerHTML = '<p class="empty">The board is empty. Add a card above.</p>';
+        return;
+      }
+      items.forEach((item, i) => {
+        const card = document.createElement("div");
+        card.className = "item";
+
+        const thumb = document.createElement("div");
+        thumb.className = "thumb";
+        thumb.textContent = item.emoji || "🖼️";
+
+        const body = document.createElement("div");
+        body.className = "body";
+        const h = document.createElement("h3");
+        h.textContent = item.title;
+        const p = document.createElement("p");
+        p.textContent = item.note;
+        body.append(h, p);
+
+        const del = document.createElement("button");
+        del.className = "del";
+        del.textContent = "×";
+        del.setAttribute("aria-label", "Delete card");
+        del.addEventListener("click", () => { items.splice(i, 1); save(); render(); });
+
+        card.append(thumb, body, del);
+        board.appendChild(card);
+      });
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = titleEl.value.trim();
+      if (!title) return;
+      items.unshift({
+        emoji: emojiEl.value.trim() || "🖼️",
+        title,
+        note: noteEl.value.trim(),
+      });
+      emojiEl.value = ""; titleEl.value = ""; noteEl.value = "";
+      save();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
