@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Trainer - Your Personal Fitness Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #5d7b94;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+            --dark-card: #1a252f;
+            --dark-text-light: #ecf0f1;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #34495e;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2c3e50;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: #5d7b94;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4a6278;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #34495e;
+            color: #34495e;
+        }
+
+        .btn-outline:hover {
+            background: rgba(52, 73, 94, 0.1);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-block {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            color: var(--dark-text);
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border-radius: 12px;
+        }
+
+        .stat-card.stat-1 {
+            background: linear-gradient(135deg, #5d7b94 0%, #4a6278 100%);
+        }
+
+        .stat-card.stat-2 {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+        }
+
+        .stat-card.stat-3 {
+            background: linear-gradient(135deg, #556e7f 0%, #445869 100%);
+        }
+
+        .stat-card.stat-4 {
+            background: linear-gradient(135deg, #4a6278 0%, #3a5268 100%);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Wizard */
+        .wizard {
+            max-width: 600px;
+            margin: 40px auto;
+        }
+
+        .wizard-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .wizard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.3s;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--dark-text);
+        }
+
+        .step p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: auto;
+            margin-right: 10px;
+            margin-top: 0;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Dashboard */
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .macro-card {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .macro-card.protein {
+            background: linear-gradient(135deg, #5d7b94 0%, #4a6278 100%);
+        }
+
+        .macro-card.carbs {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+        }
+
+        .macro-card.fats {
+            background: linear-gradient(135deg, #556e7f 0%, #445869 100%);
+        }
+
+        .macro-value {
+            font-size: 2rem;
+            margin: 10px 0;
+        }
+
+        .macro-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .meals-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .meal-item {
+            background: linear-gradient(135deg, #5d7b94 0%, #4a6278 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .history-item {
+            border-left: 4px solid #34495e;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .history-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .history-item-meta {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 90%;
+        }
+
+        .workout-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .workout-card {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .workout-card:hover {
+            border-color: #34495e;
+            background: rgba(52, 73, 94, 0.05);
+        }
+
+        .workout-card.recommended {
+            border-color: #34495e;
+            background: rgba(52, 73, 94, 0.1);
+            font-weight: 600;
+        }
+
+        .exercise-input-group {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #34495e;
+        }
+
+        .exercise-input-group h3 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .set-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .set-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+        }
+
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3c3;
+        }
+
+        .back-btn {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        // Data Management
+        const storage = {
+            save: (data) => localStorage.setItem('gymTrainerData', JSON.stringify(data)),
+            load: () => JSON.parse(localStorage.getItem('gymTrainerData') || 'null'),
+            clear: () => localStorage.removeItem('gymTrainerData'),
+            exists: () => localStorage.getItem('gymTrainerData') !== null,
+        };
+
+        // State Management
+        let appState = {
+            page: storage.exists() ? 'dashboard' : 'onboarding',
+            userData: storage.load(),
+            selectedWorkout: null,
+            workoutLog: [],
+        };
+
+        const WORKOUT_PROGRAMS = {
+            ppl: {
+                name: 'Push/Pull/Legs',
+                days: {
+                    push: [
+                        { name: 'Bench Press', sets: 4, reps: '6-8' },
+                        { name: 'Incline Dumbbell Press', sets: 3, reps: '8-10' },
+                        { name: 'Overhead Press', sets: 3, reps: '8-10' },
+                        { name: 'Tricep Dips', sets: 3, reps: '8-12' },
+                        { name: 'Lateral Raises', sets: 3, reps: '12-15' },
+                        { name: 'Tricep Pushdown', sets: 3, reps: '12-15' },
+                    ],
+                    pull: [
+                        { name: 'Deadlifts', sets: 4, reps: '5-6' },
+                        { name: 'Barbell Rows', sets: 4, reps: '6-8' },
+                        { name: 'Pull-ups', sets: 3, reps: '8-10' },
+                        { name: 'Barbell Curls', sets: 3, reps: '8-10' },
+                        { name: 'Face Pulls', sets: 3, reps: '15-20' },
+                        { name: 'Hammer Curls', sets: 3, reps: '10-12' },
+                    ],
+                    legs: [
+                        { name: 'Squats', sets: 4, reps: '6-8' },
+                        { name: 'Romanian Deadlifts', sets: 3, reps: '8-10' },
+                        { name: 'Leg Press', sets: 3, reps: '8-10' },
+                        { name: 'Leg Curls', sets: 3, reps: '10-12' },
+                        { name: 'Leg Extensions', sets: 3, reps: '12-15' },
+                        { name: 'Calf Raises', sets: 3, reps: '15-20' },
+                    ],
+                }
+            },
+            upperLower: {
+                name: 'Upper/Lower Split',
+                days: {
+                    upperA: [
+                        { name: 'Bench Press', sets: 4, reps: '6-8' },
+                        { name: 'Barbell Rows', sets: 4, reps: '6-8' },
+                        { name: 'Overhead Press', sets: 3, reps: '8-10' },
+                        { name: 'Pull-ups', sets: 3, reps: '8-10' },
+                        { name: 'Barbell Curls', sets: 3, reps: '10-12' },
+                    ],
+                    upperB: [
+                        { name: 'Incline Dumbbell Press', sets: 4, reps: '8-10' },
+                        { name: 'T-Bar Rows', sets: 4, reps: '8-10' },
+                        { name: 'Lateral Raises', sets: 3, reps: '12-15' },
+                        { name: 'Face Pulls', sets: 3, reps: '15-20' },
+                        { name: 'Tricep Dips', sets: 3, reps: '8-12' },
+                    ],
+                    lowerA: [
+                        { name: 'Squats', sets: 4, reps: '6-8' },
+                        { name: 'Romanian Deadlifts', sets: 3, reps: '8-10' },
+                        { name: 'Leg Press', sets: 3, reps: '10-12' },
+                        { name: 'Leg Curls', sets: 3, reps: '12-15' },
+                    ],
+                    lowerB: [
+                        { name: 'Deadlifts', sets: 4, reps: '5-6' },
+                        { name: 'Front Squats', sets: 3, reps: '8-10' },
+                        { name: 'Leg Extensions', sets: 3, reps: '12-15' },
+                        { name: 'Calf Raises', sets: 3, reps: '15-20' },
+                    ],
+                }
+            },
+            fullBody: {
+                name: 'Full Body',
+                days: {
+                    day1: [
+                        { name: 'Squats', sets: 3, reps: '6-8' },
+                        { name: 'Bench Press', sets: 3, reps: '6-8' },
+                        { name: 'Barbell Rows', sets: 3, reps: '6-8' },
+                        { name: 'Overhead Press', sets: 2, reps: '8-10' },
+                        { name: 'Pull-ups', sets: 2, reps: '8-12' },
+                    ],
+                    day2: [
+                        { name: 'Deadlifts', sets: 3, reps: '5-6' },
+                        { name: 'Incline Press', sets: 3, reps: '8-10' },
+                        { name: 'Rows', sets: 3, reps: '8-10' },
+                        { name: 'Leg Press', sets: 2, reps: '10-12' },
+                        { name: 'Curls', sets: 2, reps: '10-12' },
+                    ],
+                    day3: [
+                        { name: 'Front Squats', sets: 3, reps: '8-10' },
+                        { name: 'Dumbbell Press', sets: 3, reps: '8-10' },
+                        { name: 'Lat Pulldowns', sets: 3, reps: '10-12' },
+                        { name: 'Leg Curls', sets: 2, reps: '12-15' },
+                        { name: 'Flyes', sets: 2, reps: '12-15' },
+                    ],
+                }
+            }
+        };
+
+        // Calorie Calculator - ACCURATE TDEE CALCULATION
+        function calculateTDEE(weight, height, age, gender, activityLevel) {
+            // Mifflin-St Jeor formula (most accurate)
+            let bmr;
+            if (gender === 'male') {
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+            } else {
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+            }
+            const tdee = Math.round(bmr * activityLevel);
+            return Math.max(tdee, 1200); // Minimum safe calorie intake
+        }
+
+        // Accurate macro calculation
+        function getMacros(tdee, goal) {
+            let protein = 0, carbs = 0, fat = 0;
+            
+            // Protein: 0.7-1g per lb of body weight (essential for muscle)
+            if (goal.includes('Bulking')) {
+                // 30% protein, 45% carbs, 25% fat - optimal for muscle gain
+                protein = Math.round((tdee * 0.30) / 4);
+                fat = Math.round((tdee * 0.25) / 9);
+                carbs = Math.round((tdee - protein * 4 - fat * 9) / 4);
+            } else if (goal.includes('Cutting')) {
+                // 35% protein (higher to preserve muscle), 40% carbs, 25% fat
+                protein = Math.round((tdee * 0.35) / 4);
+                fat = Math.round((tdee * 0.25) / 9);
+                carbs = Math.round((tdee - protein * 4 - fat * 9) / 4);
+            } else {
+                // 30% protein, 45% carbs, 25% fat - balanced maintenance
+                protein = Math.round((tdee * 0.30) / 4);
+                fat = Math.round((tdee * 0.25) / 9);
+                carbs = Math.round((tdee - protein * 4 - fat * 9) / 4);
+            }
+            
+            return { protein, carbs, fat, total: tdee };
+        }
+
+        // Unit conversion helpers
+        function lbsToKg(lbs) {
+            return parseFloat((lbs / 2.20462).toFixed(2));
+        }
+
+        function kgToLbs(kg) {
+            return parseFloat((kg * 2.20462).toFixed(2));
+        }
+
+        function inchesToCm(inches) {
+            return parseFloat((inches * 2.54).toFixed(2));
+        }
+
+        function cmToInches(cm) {
+            return parseFloat((cm / 2.54).toFixed(2));
+        }
+
+        function getMealSuggestions(goal, tdee) {
+            // Realistic meal suggestions based on actual nutritional goals
+            const mealMap = {
+                'Bulking (Muscle Gain)': [
+                    '🍗 Grilled Chicken (200g) with Brown Rice (150g) & Broccoli',
+                    '🥩 Lean Ground Beef (200g) with Sweet Potato (200g) & Veggies',
+                    '🍌 Oatmeal (50g) with Banana, 2 tbsp Peanut Butter & Milk',
+                    '🥚 4 Whole Eggs with Whole Wheat Toast (2 slices) & Avocado',
+                    '🐟 Salmon (180g) with Quinoa (100g) & Mixed Vegetables',
+                    '🥛 Protein Shake: Whey (30g), Oats (50g), Banana & Peanut Butter',
+                ],
+                'Cutting (Fat Loss)': [
+                    '🍗 Chicken Breast (200g) with Broccoli (300g) & Brown Rice (100g)',
+                    '🐟 Tuna (150g) with Mixed Green Salad & Olive Oil Dressing',
+                    '🥚 Egg Whites (4-5) with Oatmeal (40g) & Berries',
+                    '🥒 Turkey Breast (200g) with Sweet Potato (150g) & Asparagus',
+                    '🥬 Grilled Fish (180g) with Quinoa (80g) & Leafy Greens',
+                    '🥕 Lean Ground Turkey (180g) with Cauliflower Rice & Veggies',
+                ],
+                'Leaning Out': [
+                    '🍗 Lean Protein (150-200g) with Complex Carbs & Veggies',
+                    '🥒 High Protein Options: Chicken, Turkey, Fish with Moderate Carbs',
+                    '🥕 Vegetables (300g+) with Lean Protein at Every Meal',
+                    '🍚 Rice Cakes (2) with Almond Butter (1 tbsp) Post-Workout',
+                    '🐟 Grilled Fish (180g) with Asparagus & Small Portion Brown Rice',
+                    '🥒 Greek Yogurt (200g) with Berries (100g) & Granola (20g)',
+                ],
+                'Getting Stronger': [
+                    '🥩 High Calorie Meals: Beef (250g) with Pasta & Sauce',
+                    '🍝 Pasta (150g) with Ground Beef (250g) & Vegetables',
+                    '🥜 Trail Mix & Nuts (60g) for Calorie-Dense Snack',
+                    '🍌 Pre-Workout: Banana with 2 tbsp Peanut Butter (60 min before)',
+                    '🥛 Post-Workout: Protein Shake with Carbs within 30 min',
+                    '🍞 Whole Grain Bread (2 slices) with Peanut Butter & Banana',
+                ],
+                'Maintenance': [
+                    '🍗 Balanced Chicken (150g) with Brown Rice (120g) & Veggies',
+                    '🥩 Lean Beef (150g) with Mixed Sides & Salad',
+                    '🍌 Greek Yogurt Parfait (200g) with Granola (30g) & Berries',
+                    '🍚 Fish (160g) with Brown Rice (100g) & Roasted Vegetables',
+                    '🥚 2 Whole Eggs + 3 Egg Whites with Whole Wheat Toast',
+                    '🥗 Grilled Chicken Salad with Olive Oil Dressing & Nuts',
+                ],
+            };
+
+            for (let key in mealMap) {
+                if (goal.includes(key)) {
+                    return mealMap[key];
+                }
+            }
+            return mealMap['Maintenance'];
+        }
+
+        // Render Functions
+        function renderOnboarding() {
+            const html = `
+                <div class="gradient-bg">
+                    <div class="wizard">
+                        <div class="wizard-header">
+                            <h1>💪 Gym Trainer</h1>
+                            <p>Your Personal Fitness Guide</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="wizard card" style="margin-top: -40px; position: relative; z-index: 10;">
+                        <div style="margin-bottom: 30px;">
+                            <p style="font-size: 0.9rem; color: #999; margin-bottom: 10px;">Step <span id="stepNum">1</span> of 5</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width: 20%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 1: Personal Info -->
+                        <div class="step active" id="step1">
+                            <h2>Let's Get Started! 🚀</h2>
+                            <p>Tell us about yourself</p>
+                            <div class="form-group">
+                                <label>Name <span class="required">*</span></label>
+                                <input type="text" id="name" placeholder="Your name">
+                            </div>
+                            <div class="form-group">
+                                <label>Age <span class="required">*</span></label>
+                                <input type="number" id="age" placeholder="Your age">
+                            </div>
+                            <div class="form-group">
+                                <label>Gender <span class="required">*</span></label>
+                                <select id="gender">
+                                    <option value="">Select...</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Measurements -->
+                        <div class="step" id="step2">
+                            <h2>Body Measurements 📏</h2>
+                            <p>Help us understand your current stats</p>
+                            <div class="form-group">
+                                <label>Measurement Units <span class="required">*</span></label>
+                                <select id="units">
+                                    <option value="">Select...</option>
+                                    <option value="metric">Metric (kg, cm)</option>
+                                    <option value="imperial">Imperial (lbs, inches)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label id="weightLabel">Weight (kg) <span class="required">*</span></label>
+                                <input type="number" id="weight" placeholder="e.g., 75" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label id="heightLabel">Height (cm) <span class="required">*</span></label>
+                                <input type="number" id="height" placeholder="e.g., 180" step="0.1">
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Experience & Activity -->
+                        <div class="step" id="step3">
+                            <h2>Gym Experience 🏋️</h2>
+                            <p>Help us personalize your program</p>
+                            <div class="form-group">
+                                <label>Experience Level <span class="required">*</span></label>
+                                <select id="experience">
+                                    <option value="">Select...</option>
+                                    <option value="beginner">Beginner (0-1 year)</option>
+                                    <option value="intermediate">Intermediate (1-3 years)</option>
+                                    <option value="advanced">Advanced (3+ years)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Activity Level <span class="required">*</span></label>
+                                <select id="activity">
+                                    <option value="">Select...</option>
+                                    <option value="1.2">Sedentary (1.2)</option>
+                                    <option value="1.375">Lightly Active (1.375)</option>
+                                    <option value="1.55">Moderately Active (1.55)</option>
+                                    <option value="1.725">Very Active (1.725)</option>
+                                    <option value="1.9">Extremely Active (1.9)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Sports Background -->
+                        <div class="step" id="step4">
+                            <h2>Sports Background ⚽</h2>
+                            <p>Any athletic background? (Optional)</p>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="sport1" value="Football">
+                                    <label for="sport1">Football</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="sport2" value="Basketball">
+                                    <label for="sport2">Basketball</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="sport3" value="Soccer">
+                                    <label for="sport3">Soccer</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="sport4" value="Swimming">
+                                    <label for="sport4">Swimming</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="sport5" value="Martial Arts">
+                                    <label for="sport5">Martial Arts</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="sport6" value="Cycling">
+                                    <label for="sport6">Cycling</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="sport7" value="Running">
+                                    <label for="sport7">Running</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="sport8" value="Yoga">
+                                    <label for="sport8">Yoga</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 5: Goals -->
+                        <div class="step" id="step5">
+                            <h2>Your Goals 🎯</h2>
+                            <p>What are you training for?</p>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="goal1" value="Bulking (Muscle Gain)">
+                                    <label for="goal1">Bulking (Muscle)</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="goal2" value="Cutting (Fat Loss)">
+                                    <label for="goal2">Cutting (Fat Loss)</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="goal3" value="Leaning Out">
+                                    <label for="goal3">Leaning Out</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="goal4" value="Getting Stronger">
+                                    <label for="goal4">Getting Stronger</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="goal5" value="Maintenance">
+                                    <label for="goal5">Maintenance</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="goal6" value="Athletic Performance">
+                                    <label for="goal6">Athletic Perf.</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="btn-group" style="margin-top: 30px;">
+                            <button class="btn btn-outline" id="backBtn" style="display: none;">← Back</button>
+                            <button class="btn btn-primary" id="nextBtn" style="flex: 1;">Next →</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('app').innerHTML = html;
+            attachOnboardingListeners();
+        }
+
+        function attachOnboardingListeners() {
+            let currentStep = 1;
+            let selectedUnits = 'metric';
+            const nextBtn = document.getElementById('nextBtn');
+            const backBtn = document.getElementById('backBtn');
+
+            // Unit change listener
+            document.getElementById('units').addEventListener('change', (e) => {
+                selectedUnits = e.target.value;
+                const weightLabel = document.getElementById('weightLabel');
+                const heightLabel = document.getElementById('heightLabel');
+                const weightInput = document.getElementById('weight');
+                const heightInput = document.getElementById('height');
+
+                if (selectedUnits === 'imperial') {
+                    weightLabel.textContent = 'Weight (lbs) ';
+                    heightLabel.textContent = 'Height (inches) ';
+                    weightInput.placeholder = 'e.g., 165';
+                    heightInput.placeholder = 'e.g., 71';
+                } else {
+                    weightLabel.textContent = 'Weight (kg) ';
+                    heightLabel.textContent = 'Height (cm) ';
+                    weightInput.placeholder = 'e.g., 75';
+                    heightInput.placeholder = 'e.g., 180';
+                }
+            });
+
+            function updateStep(newStep) {
+                document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+                document.getElementById(`step${newStep}`).classList.add('active');
+                
+                document.getElementById('stepNum').textContent = newStep;
+                document.getElementById('progressFill').style.width = (newStep / 5 * 100) + '%';
+                
+                backBtn.style.display = newStep === 1 ? 'none' : 'block';
+                nextBtn.textContent = newStep === 5 ? 'Complete ✓' : 'Next →';
+                
+                currentStep = newStep;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStep === 1) {
+                    const name = document.getElementById('name').value;
+                    const age = document.getElementById('age').value;
+                    const gender = document.getElementById('gender').value;
+                    if (!name || !age || !gender) {
+                        alert('Please fill in all fields');
+                        return;
+                    }
+                } else if (currentStep === 2) {
+                    const units = document.getElementById('units').value;
+                    const weight = document.getElementById('weight').value;
+                    const height = document.getElementById('height').value;
+                    if (!units || !weight || !height) {
+                        alert('Please select units and fill in measurements');
+                        return;
+                    }
+                } else if (currentStep === 3) {
+                    const exp = document.getElementById('experience').value;
+                    const act = document.getElementById('activity').value;
+                    if (!exp || !act) {
+                        alert('Please select options');
+                        return;
+                    }
+                } else if (currentStep === 5) {
+                    const goals = Array.from(document.querySelectorAll('#goal1, #goal2, #goal3, #goal4, #goal5, #goal6'))
+                        .filter(el => el.checked)
+                        .map(el => el.value);
+                    if (goals.length === 0) {
+                        alert('Please select at least one goal');
+                        return;
+                    }
+
+                    // Save data
+                    const sports = Array.from(document.querySelectorAll('#sport1, #sport2, #sport3, #sport4, #sport5, #sport6, #sport7, #sport8'))
+                        .filter(el => el.checked)
+                        .map(el => el.value);
+
+                    let weight = parseFloat(document.getElementById('weight').value);
+                    let height = parseFloat(document.getElementById('height').value);
+
+                    // Convert to metric if imperial
+                    if (selectedUnits === 'imperial') {
+                        weight = lbsToKg(weight);
+                        height = inchesToCm(height);
+                    }
+
+                    const profile = {
+                        name: document.getElementById('name').value,
+                        age: parseInt(document.getElementById('age').value),
+                        gender: document.getElementById('gender').value,
+                        weight: weight,
+                        height: height,
+                        experience: document.getElementById('experience').value,
+                        activityLevel: parseFloat(document.getElementById('activity').value),
+                        sports: sports,
+                        goals: goals,
+                        units: selectedUnits, // Store user's preferred units
+                    };
+
+                    const tdee = calculateTDEE(profile.weight, profile.height, profile.age, profile.gender, profile.activityLevel);
+                    const macros = getMacros(tdee, goals[0]);
+
+                    appState.userData = {
+                        profile,
+                        tdee,
+                        macros,
+                        sessions: [],
+                        createdAt: new Date().toISOString(),
+                    };
+
+                    storage.save(appState.userData);
+                    appState.page = 'dashboard';
+                    render();
+                    return;
+                }
+
+                if (currentStep < 5) {
+                    updateStep(currentStep + 1);
+                }
+            });
+
+            backBtn.addEventListener('click', () => {
+                if (currentStep > 1) {
+                    updateStep(currentStep - 1);
+                }
+            });
+        }
+
+        function renderDashboard() {
+            const { profile, tdee, macros, sessions } = appState.userData;
+            const primaryGoal = profile.goals[0] || 'Maintenance';
+            const meals = getMealSuggestions(primaryGoal, tdee);
+            
+            // Display weight in user's preferred units
+            let displayWeight = profile.weight;
+            let weightUnit = 'kg';
+            if (profile.units === 'imperial') {
+                displayWeight = kgToLbs(profile.weight).toFixed(1);
+                weightUnit = 'lbs';
+            } else {
+                displayWeight = profile.weight.toFixed(1);
+            }
+
+            const html = `
+                <div class="gradient-bg">
+                    <div class="container">
+                        <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Welcome, ${profile.name}! 💪</h1>
+                        <p style="font-size: 1.1rem; opacity: 0.9;">Your personalized fitness journey starts here</p>
+                    </div>
+                </div>
+
+                <div class="container" style="margin-top: -20px; position: relative; z-index: 10;">
+                    <div class="stats-grid" style="margin-top: 30px;">
+                        <div class="stat-card stat-1">
+                            <div class="stat-label">Weight</div>
+                            <div class="stat-value">${displayWeight}</div>
+                            <div class="stat-label">${weightUnit}</div>
+                        </div>
+                        <div class="stat-card stat-2">
+                            <div class="stat-label">Experience</div>
+                            <div class="stat-value" style="text-transform: capitalize; font-size: 1.8rem;">${profile.experience}</div>
+                        </div>
+                        <div class="stat-card stat-3">
+                            <div class="stat-label">Workouts Logged</div>
+                            <div class="stat-value">${sessions ? sessions.length : 0}</div>
+                        </div>
+                        <div class="stat-card stat-4">
+                            <div class="stat-label">Daily TDEE</div>
+                            <div class="stat-value">${tdee}</div>
+                            <div class="stat-label">calories</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-2" style="margin-top: 30px;">
+                        <div class="card">
+                            <h2 style="margin-bottom: 20px;">📊 Nutrition Target</h2>
+                            <div style="background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                                <p style="margin-bottom: 10px;">Daily Calorie Target</p>
+                                <div style="font-size: 2.5rem; font-weight: bold;">${tdee}</div>
+                                <p style="font-size: 0.9rem; margin-top: 10px; opacity: 0.9;">Goal: <strong>${primaryGoal}</strong></p>
+                            </div>
+
+                            <div class="grid grid-3" style="gap: 15px;">
+                                <div class="macro-card protein">
+                                    <div class="macro-label">Protein</div>
+                                    <div class="macro-value">${macros.protein}g</div>
+                                    <div class="macro-label" style="font-size: 0.8rem; margin-top: 5px;">per day</div>
+                                </div>
+                                <div class="macro-card carbs">
+                                    <div class="macro-label">Carbs</div>
+                                    <div class="macro-value">${macros.carbs}g</div>
+                                    <div class="macro-label" style="font-size: 0.8rem; margin-top: 5px;">per day</div>
+                                </div>
+                                <div class="macro-card fats">
+                                    <div class="macro-label">Fats</div>
+                                    <div class="macro-value">${macros.fat}g</div>
+                                    <div class="macro-label" style="font-size: 0.8rem; margin-top: 5px;">per day</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+                                <p style="font-size: 0.85rem; color: #666; margin: 5px 0;"><strong>💡 Nutrition Guide:</strong></p>
+                                <ul style="font-size: 0.85rem; color: #666; margin: 10px 0; padding-left: 20px;">
+                                    <li>Protein: Essential for muscle recovery & growth</li>
+                                    <li>Carbs: Fuel for workouts & energy</li>
+                                    <li>Fats: Hormone regulation & nutrient absorption</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h2 style="margin-bottom: 20px;">⚡ Quick Actions</h2>
+                            <button class="btn btn-primary btn-block" onclick="startWorkout()">📝 Log Today's Workout</button>
+                            <button class="btn btn-secondary btn-block" onclick="showWorkoutHistory()">📈 View History</button>
+                            <button class="btn btn-outline btn-block" onclick="editProfile()">⚙️ Edit Profile</button>
+                            <button class="btn btn-outline btn-block" onclick="clearAllData()" style="background: #fee; border-color: #c33; color: #c33;">🗑️ Clear Data</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top: 30px;">
+                        <h2 style="margin-bottom: 20px;">🍽️ Meal Suggestions</h2>
+                        <p style="color: #666; margin-bottom: 20px;">Sample meals for: <strong>${primaryGoal}</strong></p>
+                        <div class="meals-list">
+                            ${meals.map(meal => `<div class="meal-item">${meal}</div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('app').innerHTML = html;
+        }
+
+        function startWorkout() {
+            appState.page = 'workout-selector';
+            renderWorkoutSelector();
+        }
+
+        function renderWorkoutSelector() {
+            const { profile, experience } = appState.userData.profile;
+            const recommended = profile.experience === 'beginner' ? ['fullBody'] : 
+                              profile.experience === 'intermediate' ? ['upperLower', 'ppl'] : 
+                              ['ppl', 'upperLower'];
+
+            let html = `
+                <div class="container" style="padding-top: 40px;">
+                    <button class="btn btn-outline back-btn" onclick="appState.page = 'dashboard'; render();">← Back to Dashboard</button>
+                    <h1 style="margin-bottom: 10px;">Select Your Workout</h1>
+                    <p style="color: #666; margin-bottom: 30px;">Choose a program for: <strong style="text-transform: capitalize;">${profile.experience}</strong></p>
+            `;
+
+            for (let [key, prog] of Object.entries(WORKOUT_PROGRAMS)) {
+                const isRecommended = recommended.includes(key);
+                const days = Object.keys(prog.days);
+
+                html += `
+                    <div class="card" style="${isRecommended ? 'border: 2px solid var(--primary);' : ''}">
+                        ${isRecommended ? '<div style="display: inline-block; background: var(--primary); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 15px;">✓ Recommended</div>' : ''}
+                        <h2 style="margin-bottom: 5px;">${prog.name}</h2>
+                        <p style="color: #666; margin-bottom: 20px;">${days.length} days/week</p>
+                        <div class="workout-selector-grid">
+                `;
+
+                for (let day of days) {
+                    html += `
+                        <button class="workout-card ${isRecommended ? 'recommended' : ''}" onclick="selectDay('${key}', '${day}')">
+                            <div style="font-size: 0.9rem; font-weight: 600; text-transform: capitalize;">${day.replace(/([A-Z])/g, ' $1')}</div>
+                            <div style="font-size: 0.8rem; color: #666; margin-top: 5px;">${prog.days[day].length} exercises</div>
+                        </button>
+                    `;
+                }
+
+                html += `</div></div>`;
+            }
+
+            html += `</div>`;
+            document.getElementById('app').innerHTML = html;
+        }
+
+        function selectDay(program, day) {
+            appState.selectedWorkout = { program, day };
+            appState.page = 'workout-logger';
+            renderWorkoutLogger();
+        }
+
+        function renderWorkoutLogger() {
+            const { program, day } = appState.selectedWorkout;
+            const exercises = WORKOUT_PROGRAMS[program].days[day];
+            appState.workoutLog = exercises.map(ex => ({ ...ex, sets: {} }));
+
+            let html = `
+                <div class="container" style="padding-top: 40px; max-width: 900px;">
+                    <button class="btn btn-outline back-btn" onclick="appState.page = 'workout-selector'; renderWorkoutSelector();">← Back</button>
+                    <h1 style="margin-bottom: 30px;">${day.replace(/([A-Z])/g, ' $1')} Workout</h1>
+            `;
+
+            exercises.forEach((ex, idx) => {
+                html += `
+                    <div class="exercise-input-group">
+                        <h3>${ex.name}</h3>
+                        <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">Target: ${ex.sets} sets x ${ex.reps} reps</p>
+                        <div class="set-inputs">
+                `;
+
+                for (let setNum = 1; setNum <= ex.sets; setNum++) {
+                    html += `
+                        <div>
+                            <div class="set-label">Set ${setNum}</div>
+                            <input type="number" placeholder="Reps" class="ex-${idx}-s${setNum}-reps" style="margin-bottom: 5px;">
+                            <input type="number" placeholder="Weight" class="ex-${idx}-s${setNum}-weight" step="0.5">
+                        </div>
+                    `;
+                }
+
+                html += `</div></div>`;
+            });
+
+            html += `
+                <div class="card" style="margin-top: 30px;">
+                    <div class="btn-group">
+                        <button class="btn btn-outline" onclick="appState.page = 'workout-selector'; renderWorkoutSelector();" style="flex: 1;">Cancel</button>
+                        <button class="btn btn-primary" onclick="saveWorkout();" style="flex: 1;">Save Workout ✓</button>
+                    </div>
+                </div>
+            </div>
+            `;
+
+            document.getElementById('app').innerHTML = html;
+        }
+
+        function saveWorkout() {
+            const { program, day } = appState.selectedWorkout;
+            const exercises = WORKOUT_PROGRAMS[program].days[day];
+            const logged = [];
+
+            exercises.forEach((ex, idx) => {
+                const sets = [];
+                for (let s = 1; s <= ex.sets; s++) {
+                    const reps = parseInt(document.querySelector(`.ex-${idx}-s${s}-reps`).value) || 0;
+                    const weight = parseFloat(document.querySelector(`.ex-${idx}-s${s}-weight`).value) || 0;
+                    if (reps > 0 || weight > 0) {
+                        sets.push({ reps, weight });
+                    }
+                }
+                if (sets.length > 0) {
+                    logged.push({ name: ex.name, sets });
+                }
+            });
+
+            const session = {
+                date: new Date().toLocaleDateString(),
+                program,
+                day,
+                exercises: logged,
+            };
+
+            if (!appState.userData.sessions) {
+                appState.userData.sessions = [];
+            }
+            appState.userData.sessions.push(session);
+            storage.save(appState.userData);
+
+            appState.page = 'dashboard';
+            render();
+        }
+
+        function showWorkoutHistory() {
+            const sessions = appState.userData.sessions || [];
+
+            let html = `
+                <div class="container" style="padding-top: 40px;">
+                    <button class="btn btn-outline back-btn" onclick="appState.page = 'dashboard'; render();">← Back to Dashboard</button>
+                    <h1 style="margin-bottom: 30px;">Workout History</h1>
+            `;
+
+            if (sessions.length === 0) {
+                html += `<div class="card"><p style="text-align: center; color: #999; padding: 40px;">No workouts logged yet. Start your first workout!</p></div>`;
+            } else {
+                sessions.reverse().forEach((session, idx) => {
+                    html += `
+                        <div class="history-item">
+                            <div class="history-item-title" style="text-transform: capitalize;">${session.day.replace(/([A-Z])/g, ' $1')}</div>
+                            <div class="history-item-meta">${session.date} • ${session.program}</div>
+                            <div style="margin-top: 10px;">
+                    `;
+                    
+                    session.exercises.forEach(ex => {
+                        const setStr = ex.sets.map(s => `${s.reps}x${s.weight}kg`).join(', ');
+                        html += `<p style="font-size: 0.9rem; margin-top: 5px;"><strong>${ex.name}:</strong> ${setStr}</p>`;
+                    });
+                    
+                    html += `</div></div>`;
+                });
+            }
+
+            html += `</div>`;
+            document.getElementById('app').innerHTML = html;
+            appState.page = 'history';
+        }
+
+        function editProfile() {
+            alert('Profile editing coming soon! For now, clear data and restart to modify your profile.');
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure? This will delete all your data including workout history!')) {
+                storage.clear();
+                appState = { page: 'onboarding', userData: null, selectedWorkout: null, workoutLog: [] };
+                render();
+            }
+        }
+
+        function render() {
+            if (appState.page === 'onboarding') {
+                renderOnboarding();
+            } else if (appState.page === 'dashboard') {
+                renderDashboard();
+            }
+        }
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', render);
+    </script>
+</body>
+</html>
